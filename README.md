@@ -71,7 +71,7 @@ sudo chmod 600 traefik/acme.json
 ```
 
 ### Create and mount a swapfile
-* The versions of ubuntu I've tested seem to have a bug when memory usage gets high, the kswapd0 utility will lock the cpu at 100% seemingly waiting for non-existent swap to kick in. To mitigate this, I create a 4GB swapfile
+The versions of ubuntu I've tested seem to have a bug when memory usage gets high, the kswapd0 utility will lock the cpu at 100% seemingly waiting for non-existent swap to kick in. To mitigate this, I create a 4GB swapfile
 ```bash
 sudo dd if=/dev/zero of=/swapfile bs=4M count=1024
 sudo chmod 600 /swapfile
