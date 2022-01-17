@@ -1,0 +1,32 @@
+version: "3.7"
+
+services:
+  
+  drupal-install:
+    image: localhost:5000/drush
+    depends_on:
+      - mysql
+  
+    volumes:
+
+      - drupal-webroot:/var/www/html
+
+    entrypoint: /scripts/entrypoint-install.sh
+    environment:
+      - SITE_NAME
+      - SITE_URL
+      - FROM_EMAIL
+      - ADMIN_EMAIL
+      - DRUPAL_ADMIN
+      - DRUPAL_ADMIN_PASS
+      - DRUPAL_DB_USER
+      - DRUPAL_DB
+      - CIVICRM_DB_USER
+      - CIVICRM_DB
+      - DRUPAL_DB_PASS
+      - CIVICRM_DB_PASS
+      - MYSQL_ROOT_PASSWORD
+      - CIVICRM_VERSION
+      - DRUPAL_VERSION
+    restart: "no"      
+

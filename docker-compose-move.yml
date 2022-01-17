@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  
+  drupal-move:
+    image: localhost:5000/drush
+    depends_on:
+      - mysql
+  
+    volumes:
+      - ./backup:/backup
+      - drupal-webroot:/var/www/html
+
+    entrypoint: /scripts/entrypoint-move.sh
+
+    restart: "no"      

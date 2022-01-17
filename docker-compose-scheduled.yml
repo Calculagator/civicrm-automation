@@ -1,0 +1,47 @@
+version: "3.7"
+
+services:
+  
+  drupal-scheduled:
+    image: localhost:5000/drush
+    volumes:
+      - drupal-webroot:/var/www/html
+
+    entrypoint: /scripts/entrypoint-scheduled.sh
+
+    restart: "no"    
+    environment:
+      - CIVICRM_ADMIN_USER  
+    
+  drupal-backup:
+    image: localhost:5000/drush
+    volumes:
+      - drupal-webroot:/var/www/html
+      - ./backup:/backup
+
+    entrypoint: /scripts/entrypoint-backup.sh
+
+    restart: "no"    
+    environment:
+      - CIVICRM_ADMIN_USER 
+  
+  duplicity-backup:
+    image: tecnativa/duplicity
+    volumes:
+      - ./backup:/backup:ro
+      - duplicity:/home/duplicity
+    environment:
+      - DPBX_ACCESS_TOKEN
+
+    entrypoint: 
+      - /bin/sh 
+      - -c 
+      - |
+          duplicity --full-if-older-than=1M --no-compression --no-encryption --allow-source-mismatch --progress /backup "dpbx:///HLSCRM"
+          duplicity remove-older-than 12M --force --progress --no-encryption "dpbx:///HLSCRM"
+          duplicity remove-all-inc-of-but-n-full 2 --force --progress --no-encryption "dpbx:///HLSCRM"
+          duplicity cleanup --force --progress --no-encryption "dpbx:///HLSCRM"
+
+volumes:
+  duplicity:
+    

@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  drupal-restore:
+    image: localhost:5000/drush
+    volumes:
+      - drupal-webroot:/var/www/html
+      - ./backup:/backup
+
+    entrypoint: /scripts/entrypoint-restore.sh
+
+    restart: "no"    
+    environment:
+      - CIVICRM_ADMIN_USER
+      - SITE_NAME
+      - SITE_URL
+      - FROM_EMAIL
+      - ADMIN_EMAIL
+      - DRUPAL_ADMIN
+      - DRUPAL_ADMIN_PASS
+      - DRUPAL_DB_USER
+      - DRUPAL_DB
+      - CIVICRM_DB_USER
+      - CIVICRM_DB
+      - DRUPAL_DB_PASS
+      - CIVICRM_DB_PASS
+      - MYSQL_ROOT_PASSWORD
+      - CIVICRM_VERSION
+      - DRUPAL_VERSION
+    depends_on:
+      - mysql
+  
+  duplicity-restore:
+    image: tecnativa/duplicity
+    volumes:
+      - ./backup:/backup
+      - duplicity:/home/duplicity
+    environment:
+      - DPBX_ACCESS_TOKEN
+
+    entrypoint: 
+      - /bin/sh 
+      - -c 
+      - |
+          duplicity --no-compression --no-encryption --allow-source-mismatch --progress "dpbx:///HLSCRM" /backup 
+
+
+volumes:
+  duplicity:
+    

@@ -1,0 +1,77 @@
+version: "3.7"
+
+
+services:
+  reverse-proxy: #traefik?
+    image: traefik
+    # command: #--api # --docker # Enables the web UI and tells Traefik to listen to docker
+    ports:
+      - "80:80"     # The HTTP port
+      - "443:443"   # HTTPS
+      - "8080:8080" # The Web UI (enabled by --api)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/traefik.toml
+      - ./traefik/acme.json:/acme.json
+    container_name: traefik 
+    restart: always 
+    environment:
+      - SITE_NAME
+      - SITE_URL
+
+  drupal-nginx:
+    depends_on:
+      - drupal
+    image: nginx:alpine
+
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - drupal-webroot:/var/www/html
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${SITE_URL}"
+      - "traefik.backend=drupal"
+      - "traefik.protocol=http"
+      - "traefik.port=80"  
+  drupal:
+    depends_on:
+      - mysql
+    image: localhost:5000/php-fpm
+
+
+    volumes:
+      # - ./drupal/modules:/var/www/html/modules
+      # - ./drupal/profiles:/var/www/html/profiles
+      # - ./drupal/themes:/var/www/html/themes 
+      # using drush to install and upgrade means we may not need the separate volumes.
+      # any customizations that should persist can be scripted in drush
+
+      - drupal-webroot:/var/www/html
+    restart: always
+
+  mysql:
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD
+    volumes:
+      # these might be moved to docker volumes once install/update/backup are implemented
+      - mysql-db:/var/lib/mysql
+
+    restart: always
+
+  smtp-relay:
+    image: namshi/smtp
+    restart: always
+    environment:
+      - RELAY_NETWORKS
+      - SMARTHOST_ADDRESS
+      - SMARTHOST_PORT
+
+volumes:
+   drupal-webroot:
+   mysql-db:
+
