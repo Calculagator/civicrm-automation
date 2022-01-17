@@ -1,11 +1,11 @@
 # CiviCRM Modular installer/upgrader
 
 ## Features:
-Downloads and installs CiviCRM with Drupal 7 and drush on a clean server
-Uses Docker to manage services (mysql, mail server, backups)
-Takes daily backups and stores them on dropbox.
-Can create an empty site or restore an existing one from dropbox
-Upgrading is as simple as changing the desired versions in the .env file and rebuilding
+* Downloads and installs CiviCRM with Drupal 7 and drush on a clean server
+* Uses Docker to manage services (mysql, mail server, backups)
+* Takes daily backups and stores them on dropbox.
+* Can create an empty site or restore an existing one from dropbox
+* Upgrading is as simple as changing the desired versions in the .env file and rebuilding
 
 ## Modules
 * Drupal 7 on php-fpm
